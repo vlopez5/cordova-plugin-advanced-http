@@ -47,6 +47,8 @@ abstract class CordovaHttp {
     private int timeoutInMilliseconds;
     private CallbackContext callbackContext;
 
+    protected Long startTime = null;
+
     public CordovaHttp(String urlString, Object params, JSONObject headers, int timeout, CallbackContext callbackContext) {
         this(urlString, params, "default", headers, timeout, callbackContext);
     }
@@ -254,6 +256,9 @@ abstract class CordovaHttp {
 
         if (code >= 200 && code < 300) {
             response.put("data", decodeBody(rawOutputReference, request.charset()));
+            if (startTime != null ) {
+                response.put("elapsedTime", Long.toString(System.currentTimeMillis() - startTime));
+            }
             this.getCallbackContext().success(response);
         } else {
             response.put("error", decodeBody(rawOutputReference, request.charset()));

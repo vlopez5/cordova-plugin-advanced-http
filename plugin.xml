@@ -23,6 +23,7 @@
         <param name="ios-package" value="CordovaHttpPlugin"/>
       </feature>
     </config-file>
+    <framework src="QuartzCore.framework"/>
     <header-file src="src/ios/CordovaHttpPlugin.h"/>
     <header-file src="src/ios/TextResponseSerializer.h"/>
     <header-file src="src/ios/TextRequestSerializer.h"/>

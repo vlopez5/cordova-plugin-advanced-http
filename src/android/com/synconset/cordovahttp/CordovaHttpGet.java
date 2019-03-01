@@ -24,6 +24,8 @@ class CordovaHttpGet extends CordovaHttp implements Runnable {
     @Override
     public void run() {
         try {
+            startTime = System.currentTimeMillis();
+
             HttpRequest request = HttpRequest.get(this.getUrlString(), this.getParamsMap(), false);
 
             this.prepareRequest(request);

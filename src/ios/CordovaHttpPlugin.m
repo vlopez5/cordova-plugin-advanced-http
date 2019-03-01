@@ -3,6 +3,7 @@
 #import "TextResponseSerializer.h"
 #import "TextRequestSerializer.h"
 #import "AFHTTPSessionManager.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface CordovaHttpPlugin()
 
@@ -19,6 +20,7 @@
 @implementation CordovaHttpPlugin {
     AFSecurityPolicy *securityPolicy;
     bool redirect;
+    NSTimeInterval _beginTransactionTime;
 }
 
 - (void)pluginInitialize {
@@ -57,6 +59,10 @@
         [dictionary setValue:response.URL.absoluteString forKey:@"url"];
         [dictionary setObject:[NSNumber numberWithInt:(int)response.statusCode] forKey:@"status"];
         [dictionary setObject:[self copyHeaderFields:response.allHeaderFields] forKey:@"headers"];
+        if (_beginTransactionTime > 0) {
+            NSLog(@"Total Runtime: %f", (100*(CACurrentMediaTime()  - _beginTransactionTime)));
+            [dictionary setObject:[NSString stringWithFormat:@"%f",100*(CACurrentMediaTime() - _beginTransactionTime)] forKey:@"elapsedTime"];
+        }
     }
 
     if (data != nil) {
@@ -66,11 +72,16 @@
 
 - (void)handleError:(NSMutableDictionary*)dictionary withResponse:(NSHTTPURLResponse*)response error:(NSError*)error {
     if (response != nil) {
-        [dictionary setValue:response.URL.absoluteString forKey:@"url"];
-        [dictionary setObject:[NSNumber numberWithInt:(int)response.statusCode] forKey:@"status"];
-        [dictionary setObject:[self copyHeaderFields:response.allHeaderFields] forKey:@"headers"];
-        if (error.userInfo[AFNetworkingOperationFailingURLResponseBodyKey]) {
-            [dictionary setObject:error.userInfo[AFNetworkingOperationFailingURLResponseBodyKey] forKey:@"error"];
+        @try {
+            [dictionary setValue:response.URL.absoluteString forKey:@"url"];
+            [dictionary setObject:[NSNumber numberWithInt:response.statusCode] forKey:@"status"];
+            [dictionary setObject:[self copyHeaderFields:response.allHeaderFields] forKey:@"headers"];
+            [dictionary setObject:[[NSString alloc] initWithData:(NSData *)error.userInfo[AFNetworkingOperationFailingURLResponseDataErrorKey] encoding:NSUTF8StringEncoding] forKey:@"error"];
+        }
+        @catch (NSException *exception) {
+
+            NSLog(@"Exception: %@", exception);
+
         }
     } else {
         [dictionary setObject:[self getStatusCode:error] forKey:@"status"];
@@ -172,7 +183,7 @@
 
     CordovaHttpPlugin* __weak weakSelf = self;
     manager.responseSerializer = [TextResponseSerializer serializer];
-
+    _beginTransactionTime = CACurrentMediaTime();
     @try {
         [manager POST:url parameters:parameters progress:nil success:^(NSURLSessionTask *task, id responseObject) {
             NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
@@ -195,6 +206,8 @@
 
 - (void)get:(CDVInvokedUrlCommand*)command {
     AFHTTPSessionManager *manager = [AFHTTPSessionManager manager];
+    [manager.requestSerializer setValue:@"no-store" forHTTPHeaderField:@"Cache-Control"];
+    [manager.requestSerializer setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
     manager.securityPolicy = securityPolicy;
 
     NSString *url = [command.arguments objectAtIndex:0];
