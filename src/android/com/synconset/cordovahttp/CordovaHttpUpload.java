@@ -68,10 +68,11 @@ class CordovaHttpUpload extends CordovaHttp implements Runnable {
                 String filePath = filePaths.getString(j);
                 Uri uri = Uri.parse(filePath);
                 FileDetail fileDetail = getFileDetailFromUri(context, uri);
+                String fname = this.name + (j+1);
 
                 // File Scheme
                 if (ContentResolver.SCHEME_FILE.equals(uri.getScheme())) {
-                    request.part(this.name, fileDetail.fileName, fileDetail.mimeType, new File(new URI(filePath)));
+                    request.part(fname, fileDetail.fileName, fileDetail.mimeType, new File(new URI(filePath)));
                 }
                 // Content Scheme
                 else if (ContentResolver.SCHEME_CONTENT.equals(uri.getScheme()))  {

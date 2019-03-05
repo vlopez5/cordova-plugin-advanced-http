@@ -421,7 +421,8 @@
                 id obj = [filePaths objectAtIndex:i];
                 NSString *filePath = (NSString *) obj;
                 NSURL *fileURL = [NSURL URLWithString: filePath];
-                [formData appendPartWithFileURL:fileURL name:name error:&error];
+                NSString *fname = [NSString stringWithFormat:@"%@ %d",name,i];
+                [formData appendPartWithFileURL:fileURL name:fname error:&error];
             }
             if (error) {
                 NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
