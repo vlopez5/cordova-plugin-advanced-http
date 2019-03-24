@@ -423,6 +423,7 @@
                 NSString *filePath = (NSString *) obj;
                 NSString *fileName = (NSString *) objNames;
                 NSURL *fileURL = [NSURL URLWithString: filePath];
+                NSLog(@"VITOR ====>>> PASSANDO POR AQUI");
                 [formData appendPartWithFileURL:fileURL name:fileName error:&error];
             }
             if (error) {
