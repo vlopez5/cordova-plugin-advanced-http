@@ -403,7 +403,7 @@
     NSString *serializerName = [command.arguments objectAtIndex:2];
     NSDictionary *headers = [command.arguments objectAtIndex:3];
     NSArray *filePaths = [command.arguments objectAtIndex: 4];
-    NSString *name = [command.arguments objectAtIndex: 5];
+    NSArray *fileNames = [command.arguments objectAtIndex: 5];
     NSTimeInterval timeoutInSeconds = [[command.arguments objectAtIndex:6] doubleValue];
 
     [self setRequestSerializer: serializerName forManager: manager];
@@ -419,11 +419,11 @@
             NSError *error;
             for (int i = 0; i < [filePaths count]; i++) {
                 id obj = [filePaths objectAtIndex:i];
+                id objNames = [fileNames objectAtIndex:i];
                 NSString *filePath = (NSString *) obj;
+                NSString *fileName = (NSString *) objNames;
                 NSURL *fileURL = [NSURL URLWithString: filePath];
-                NSString *fname = [NSString stringWithFormat:@"%@[%d]",name,i];
-                NSLog(@"%@", fname);
-                [formData appendPartWithFileURL:fileURL name:fname error:&error];
+                [formData appendPartWithFileURL:fileURL name:fileName error:&error];
             }
             if (error) {
                 NSMutableDictionary *dictionary = [NSMutableDictionary dictionary];
