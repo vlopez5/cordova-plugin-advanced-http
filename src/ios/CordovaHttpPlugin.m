@@ -421,7 +421,7 @@
                 id obj = [filePaths objectAtIndex:i];
                 NSString *filePath = (NSString *) obj;
                 NSURL *fileURL = [NSURL URLWithString: filePath];
-                NSString *fname = [NSString stringWithFormat:@"%@ %d",name,i];
+                NSString *fname = [NSString stringWithFormat:@"%@[%d]",name,i];
                 [formData appendPartWithFileURL:fileURL name:fname error:&error];
             }
             if (error) {
